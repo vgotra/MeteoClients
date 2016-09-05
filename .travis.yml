@@ -1,0 +1,31 @@
+language: csharp
+sudo: required 
+dist: trusty
+env:  
+  - CLI_VERSION=latest
+addons:  
+  apt:
+    packages:
+    - gettext
+    - libcurl4-openssl-dev
+    - libicu-dev
+    - libssl-dev
+    - libunwind8
+    - zlib1g  
+os:  
+  - linux
+branches:  
+  only:
+    - master
+before_install:  
+  - chmod +x build.sh
+  - sudo sh -c 'echo "deb [arch=amd64] https://apt-mo.trafficmanager.net/repos/dotnet-release/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
+  - sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
+  - sudo apt-get update
+install:  
+  - sudo apt-get install dotnet-dev-1.0.0-preview2-003121
+script:    # the following commands are just examples, use whatever your build process requires
+  - ./build.sh
+# - cat dotnetbuild.log
+# - ./test.sh
+  

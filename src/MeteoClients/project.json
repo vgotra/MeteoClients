@@ -1,6 +1,6 @@
 {
   "title": "MeteoClients",
-  "description": ".NET Core implementation of REST clients for weather services.",
+  "description": ".NET Core implementation of REST clients for few weather services.",
   "version": "1.0.0-*",
 
   "dependencies": {

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using MeteoClients.Extensions;
+using MeteoClients.OpenWeatherMap.Contracts;
 using MeteoClients.OpenWeatherMap.Settings;
 using Newtonsoft.Json;
 
@@ -9,32 +13,27 @@ namespace MeteoClients.OpenWeatherMap
 {
     public class OpenWeatherMapApiClient : IOpenWeatherMapApiClient
     {
-        private readonly OpenWeatherMapOptions _options;
-
-        public OpenWeatherMapApiClient(OpenWeatherMapOptions options)
+        public OpenWeatherMapApiClient(string apiKey, string baseUrl = "http://api.openweathermap.org/data/2.5")
         {
-            ValidateSettings(options);
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ArgumentNullException(nameof(apiKey));
+            }
 
-            _options = options;
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                throw new ArgumentNullException(nameof(baseUrl));
+            }
+
+            ApiKey = apiKey;
+            BaseUrl = baseUrl;
         }
 
-        private void ValidateSettings(OpenWeatherMapOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (string.IsNullOrWhiteSpace(options.BaseUrl))
-            {
-                throw new ArgumentNullException(nameof(options.BaseUrl));
-            }
-
-            if (string.IsNullOrWhiteSpace(options.ApiKey))
-            {
-                throw new ArgumentNullException(nameof(options.ApiKey));
-            }
-        }
+        public string BaseUrl { get; }
+        public string ApiKey { get; }
+        public SearchAccuracy SearchAccuracy { get; set; } = SearchAccuracy.Like;
+        public UnitsFormat UnitsFormat { get; set; } = UnitsFormat.Kelvin;
+        public SupportedLanguage Language { get; set; } = SupportedLanguage.English;
 
         public async Task<OpenWeatherMapResponse> GetByCityAsync(string city, string countryCode = null)
         {
@@ -44,7 +43,7 @@ namespace MeteoClients.OpenWeatherMap
             }
 
             var url = ApplyOptionsToQuery(GetWeatherByCityUrl(city, countryCode));
-            return await GetWeatherAsync(url);
+            return await GetWeatherAsync<OpenWeatherMapResponse>(url);
         }
 
         public async Task<string> GetByCityAsHtmlAsync(string city, string countryCode = null)
@@ -61,7 +60,13 @@ namespace MeteoClients.OpenWeatherMap
         public async Task<OpenWeatherMapResponse> GetByCityIdAsync(int cityId)
         {
             var url = ApplyOptionsToQuery(GetWeatherByCityIdUrl(cityId));
-            return await GetWeatherAsync(url);
+            return await GetWeatherAsync<OpenWeatherMapResponse>(url);
+        }
+
+        public async Task<MultipleCitiesResponse> GetByCitiesIdsAsync(params int[] cityIds)
+        {
+            var url = ApplyOptionsToQuery(GetWeatherByCitiesIdsUrl(cityIds));
+            return await GetWeatherAsync<MultipleCitiesResponse>(url, Encoding.UTF8);
         }
 
         public async Task<string> GetByCityIdAsHtmlAsync(int cityId)
@@ -73,7 +78,7 @@ namespace MeteoClients.OpenWeatherMap
         public async Task<OpenWeatherMapResponse> GetByCityCoordinatesAsync(float latitude, float longitude)
         {
             var url = ApplyOptionsToQuery(GetWeatherByCityCoordinatesUrl(latitude, longitude));
-            return await GetWeatherAsync(url);
+            return await GetWeatherAsync<OpenWeatherMapResponse>(url);
         }
 
         public async Task<string> GetByCityCoordinatesAsHtmlAsync(float latitude, float longitude)
@@ -90,7 +95,7 @@ namespace MeteoClients.OpenWeatherMap
             }
 
             var url = ApplyOptionsToQuery(GetWeatherByZipCodeUrl(zipCode, countryCode));
-            return await GetWeatherAsync(url);
+            return await GetWeatherAsync<OpenWeatherMapResponse>(url);
         }
 
         public async Task<string> GetByZipCodeAsHtmlAsync(int zipCode, string countryCode)
@@ -104,26 +109,57 @@ namespace MeteoClients.OpenWeatherMap
             return await GetWeatherAsHtmlAsync(url);
         }
 
-        private static async Task<OpenWeatherMapResponse> GetWeatherAsync(string url)
+        public async Task<CitiesInRectangleResponse> GetByRectangleAsync(float longitudeLeft, float latitudeBottom, float longitudeRight, float latitudeTop, 
+            bool useServerClustering, int count = 10)
         {
-
-            var message = await new HttpClient().GetAsync(url).ConfigureAwait(false);
-            message.EnsureSuccessStatusCode();
-
-            return JsonConvert.DeserializeObject<OpenWeatherMapResponse>(await message.Content.ReadAsStringAsync().ConfigureAwait(false));
+            throw new NotImplementedException("check long/lat order");
+            var url = ApplyOptionsToQuery(GetWeatherGetByRectangleZoneUrl(longitudeLeft, latitudeBottom, longitudeRight, latitudeTop, useServerClustering, count));
+            return await GetWeatherAsync<CitiesInRectangleResponse>(url, Encoding.UTF8);
         }
 
-        private static async Task<string> GetWeatherAsHtmlAsync(string url)
+        public async Task<CitiesInCircleResponse> GetByCircleAsync(float centerLongitude, float centerLatitude, bool useServerClustering, int count)
         {
+            var url = ApplyOptionsToQuery(GetWeatherGetByCircleUrl(centerLongitude, centerLatitude, useServerClustering, count));
+            return await GetWeatherAsync<CitiesInCircleResponse>(url, Encoding.UTF8);
+        }
+
+        
+
+        private static async Task<T> GetWeatherAsync<T>(string url, Encoding encoding = null) where T: class
+        {
+
             var message = await new HttpClient().GetAsync(url).ConfigureAwait(false);
             message.EnsureSuccessStatusCode();
 
-            return await message.Content.ReadAsStringAsync().ConfigureAwait(false);
+            string response = null;
+            if (encoding == null)
+            {
+                response = await message.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                response = encoding.GetString(await message.Content.ReadAsByteArrayAsync().ConfigureAwait(false));
+            }
+
+            return JsonConvert.DeserializeObject<T>(response);
+        }
+
+        private static async Task<string> GetWeatherAsHtmlAsync(string url, Encoding encoding = null)
+        {
+            var message = await new HttpClient().GetAsync($"{url}&mode=html").ConfigureAwait(false);
+            message.EnsureSuccessStatusCode();
+
+            if (encoding == null)
+            {
+                return await message.Content.ReadAsStringAsync().ConfigureAwait(false);
+            }
+
+            return encoding.GetString(await message.Content.ReadAsByteArrayAsync().ConfigureAwait(false));
         }
 
         private string GetWeatherByCityUrl(string city, string countryCode)
         {
-            var url = $"{_options.BaseUrl}?q={city}";
+            var url = $"{BaseUrl}/weather?q={city}";
 
             if (!string.IsNullOrWhiteSpace(countryCode))
             {
@@ -135,25 +171,51 @@ namespace MeteoClients.OpenWeatherMap
 
         private string GetWeatherByCityIdUrl(int cityId)
         {
-            var url = $"{_options.BaseUrl}?id={cityId}";
+            var url = $"{BaseUrl}/weather?id={cityId}";
+            return url;
+        }
+
+        private string GetWeatherByCitiesIdsUrl(params int[] cityIds)
+        {
+            var ids = string.Empty;
+            if (cityIds != null && cityIds.Any())
+            {
+                ids = cityIds.Select(x => x.ToString()).Aggregate((f, s) => $"{f},{s}");
+            }
+            var url = $"{BaseUrl}/group?id={ids}";
             return url;
         }
 
         private string GetWeatherByCityCoordinatesUrl(float latitude, float longitude)
         {
-            var url = $"{_options.BaseUrl}?lat={latitude.Invariant()}&lon={longitude.Invariant()}";
+            var url = $"{BaseUrl}/weather?lat={latitude.Invariant()}&lon={longitude.Invariant()}";
             return url;
         }
 
         private string GetWeatherByZipCodeUrl(int zipCode, string countryCode)
         {
-            var url = $"{_options.BaseUrl}?zip={zipCode},{countryCode}";
+            var url = $"{BaseUrl}/weather?zip={zipCode},{countryCode}";
+            return url;
+        }
+
+        private string GetWeatherGetByRectangleZoneUrl(float longitudeLeft, float latitudeBottom, float longitudeRight, float latitudeTop,
+            bool useServerClustering, int count = 10)
+        {
+            var cluster = useServerClustering ? "yes" : "no";
+            var url = $"{BaseUrl}/box/city?bbox={longitudeLeft.Invariant()},{latitudeBottom.Invariant()},{longitudeRight.Invariant()},{latitudeTop.Invariant()},{count}&cluster={cluster}";
+            return url;
+        }
+
+        private string GetWeatherGetByCircleUrl(float centerLongitude, float centerLatitude, bool useServerClustering, int count)
+        {
+            var cluster = useServerClustering ? "yes" : "no";
+            var url = $"{BaseUrl}/find?lat={centerLongitude.Invariant()}&lon={centerLatitude.Invariant()}&cnt={count}&cluster={cluster}";
             return url;
         }
 
         private string ApplyOptionsToQuery(string url)
         {
-            var temp = $"{url}&appid={_options.ApiKey}";
+            var temp = $"{url}&appid={ApiKey}";
 
             temp = ApplySearchAccuracyOptions(temp);
 
@@ -168,7 +230,7 @@ namespace MeteoClients.OpenWeatherMap
         {
             var temp = url;
 
-            if (_options.SearchAccuracy == SearchAccuracy.Accurate)
+            if (SearchAccuracy == SearchAccuracy.Accurate)
             {
                 temp = $"{temp}&type=accurate";
             }
@@ -180,7 +242,7 @@ namespace MeteoClients.OpenWeatherMap
         {
             var temp = url;
 
-            switch (_options.UnitsFormat)
+            switch (UnitsFormat)
             {
                 case UnitsFormat.Kelvin:
                     break;
@@ -199,7 +261,7 @@ namespace MeteoClients.OpenWeatherMap
         {
             var temp = url;
 
-            switch (_options.Language)
+            switch (Language)
             {
                 case SupportedLanguage.English:
                     break;

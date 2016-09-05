@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MeteoClients.Extensions;
+using MeteoClients.ForecastIo.Contracts;
 using MeteoClients.ForecastIo.Settings;
 using Newtonsoft.Json;
 
@@ -12,32 +13,29 @@ namespace MeteoClients.ForecastIo
     public class ForecastIoApiClient : IForecastIoApiClient
     {
         private const string NumberOfApiCallsHeaderKey = "X-Forecast-API-Calls";
-        private readonly ForecastIoOptions _options;
 
-        public ForecastIoApiClient(ForecastIoOptions options)
+        public ForecastIoApiClient(string apiKey, string baseUrl = "https://api.forecast.io/forecast")
         {
-            ValidateSettings(options);
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ArgumentNullException(nameof(apiKey));
+            }
 
-            _options = options;
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                throw new ArgumentNullException(nameof(baseUrl));
+            }
+
+            ApiKey = apiKey;
+            BaseUrl = baseUrl;
         }
 
-        private void ValidateSettings(ForecastIoOptions options)
-        {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (string.IsNullOrWhiteSpace(options.BaseUrl))
-            {
-                throw new ArgumentNullException(nameof(options.BaseUrl));
-            }
-
-            if (string.IsNullOrWhiteSpace(options.ApiKey))
-            {
-                throw new ArgumentNullException(nameof(options.ApiKey));
-            }
-        }
+        public string BaseUrl { get; }
+        public string ApiKey { get; }
+        public Unit Unit { get; set; } = Unit.Auto;
+        public List<Block> ExcludeBlocks { get; set; } = null;
+        public bool ExtendHourlyData { get; set; } = false;
+        public SupportedLanguage Language { get; set; } = SupportedLanguage.English;
 
         public async Task<ForecastIoResponse> GetByCoordinatesAsync(float latitude, float longitude, DateTime? time = null)
         {
@@ -73,7 +71,7 @@ namespace MeteoClients.ForecastIo
 
         private string PrepareBaseUrl()
         {
-            var temp = $"{_options.BaseUrl}/{_options.ApiKey}";
+            var temp = $"{BaseUrl}/{ApiKey}";
             return temp;
         }
 
@@ -96,7 +94,7 @@ namespace MeteoClients.ForecastIo
         {
             var temp = url;
 
-            switch (_options.Unit)
+            switch (Unit)
             {
                 case Unit.Auto:
                     break;
@@ -121,11 +119,11 @@ namespace MeteoClients.ForecastIo
         {
             var temp = url;
 
-            if (_options.ExcludeBlocks != null && _options.ExcludeBlocks.Any())
+            if (ExcludeBlocks != null && ExcludeBlocks.Any())
             {
                 var partTemp = "&exclude=";
 
-                foreach (var excludeBlock in _options.ExcludeBlocks)
+                foreach (var excludeBlock in ExcludeBlocks)
                 {
                     switch (excludeBlock)
                     {
@@ -147,8 +145,6 @@ namespace MeteoClients.ForecastIo
                         case Block.Flags:
                             partTemp = $"{partTemp}flags,";
                             break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
                     }
                 }
 
@@ -162,7 +158,7 @@ namespace MeteoClients.ForecastIo
         {
             var temp = url;
 
-            switch (_options.Language)
+            switch (Language)
             {
                 case SupportedLanguage.English:
                     break;
@@ -250,8 +246,9 @@ namespace MeteoClients.ForecastIo
                 case SupportedLanguage.TraditionalChinese:
                     temp = $"{temp}&lang=zh-tw";
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                case SupportedLanguage.Azerbaijani:
+                    temp = $"{temp}&lang=az";
+                    break;
             }
 
             return temp;
@@ -261,7 +258,7 @@ namespace MeteoClients.ForecastIo
         {
             var temp = url;
 
-            if (_options.ExtendHourlyData)
+            if (ExtendHourlyData)
             {
                 temp = $"{temp}&extend=hourly";
             }

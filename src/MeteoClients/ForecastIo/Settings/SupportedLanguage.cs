@@ -30,6 +30,7 @@
         Ukrainian,
         IgpayAtinlay,
         SimplifiedChinese,
-        TraditionalChinese
+        TraditionalChinese,
+        Azerbaijani
     }
 }

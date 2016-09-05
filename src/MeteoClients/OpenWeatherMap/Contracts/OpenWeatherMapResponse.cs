@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using MeteoClients.OpenWeatherMap.Contracts;
 
-namespace MeteoClients.OpenWeatherMap
+namespace MeteoClients.OpenWeatherMap.Contracts
 {
     public class OpenWeatherMapResponse
     {

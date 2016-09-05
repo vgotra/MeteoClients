@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using MeteoClients.ForecastIo.Contracts;
 
-namespace MeteoClients.ForecastIo
+namespace MeteoClients.ForecastIo.Contracts
 {
     public class ForecastIoResponse
     {
