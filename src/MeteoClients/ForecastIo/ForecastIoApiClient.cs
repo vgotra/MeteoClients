@@ -32,9 +32,10 @@ using Newtonsoft.Json;
 
 namespace MeteoClients.ForecastIo
 {
-    public class ForecastIoApiClient : IForecastIoApiClient
+    public class ForecastIoApiClient : IForecastIoApiClient, IDisposable
     {
         private const string NumberOfApiCallsHeaderKey = "X-Forecast-API-Calls";
+        private readonly HttpClient _httpClient = new HttpClient();
 
         public ForecastIoApiClient(string apiKey, string baseUrl = "https://api.forecast.io/forecast")
         {
@@ -73,7 +74,7 @@ namespace MeteoClients.ForecastIo
 
             var url = PrepareUrl(latitude, longitude, time);
 
-            var message = await new HttpClient().GetAsync(url).ConfigureAwait(false);
+            var message = await _httpClient.GetAsync(url).ConfigureAwait(false);
             message.EnsureSuccessStatusCode();
 
             var response = JsonConvert.DeserializeObject<GenericResponse>(await message.Content.ReadAsStringAsync().ConfigureAwait(false));
@@ -307,6 +308,11 @@ namespace MeteoClients.ForecastIo
             }
 
             return number;
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 }

@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
+
 using System;
 using MeteoClients.OpenWeatherMap;
 using Newtonsoft.Json;
@@ -33,103 +34,62 @@ namespace OpenWeatherMap
             // get your api key at https://home.openweathermap.org/api_keys page
             var apiKey = "881c6ac8ad540793a69ff2eb9bbb3119";
             CheckCurrentWeather(apiKey);
-            CheckShortTermWeather(apiKey);
+            //CheckShortTermWeather(apiKey);
         }
 
         private static void CheckShortTermWeather(string apiKey)
         {
-            var shortTermForecastApiClient = new ShortTermForecastApiClient(apiKey);
+            using (var client = new ShortTermForecastApiClient(apiKey))
+            {
+                var data = client.GetByCityAsync("London").GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
 
-            var data =
-                shortTermForecastApiClient.GetByCityAsync("London").ConfigureAwait(false).GetAwaiter().GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
+                var cityCoordinates = client.GetByCityCoordinatesAsync(51.507351f, -0.127758f).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityCoordinates, Formatting.Indented));
 
-            var cityCoordinates =
-                shortTermForecastApiClient.GetByCityCoordinatesAsync(51.507351f, -0.127758f)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityCoordinates, Formatting.Indented));
-
-            var cityId =
-                shortTermForecastApiClient.GetByCityIdAsync(2643743).ConfigureAwait(false).GetAwaiter().GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityId, Formatting.Indented));
+                var cityId = client.GetByCityIdAsync(2643743).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityId, Formatting.Indented));
+            }
         }
 
         private static void CheckCurrentWeather(string apiKey)
         {
-            var currentWeatherApiClient = new CurrentWeatherApiClient(apiKey);
+            using (var client = new CurrentWeatherApiClient(apiKey))
+            {
+                var data = client.GetByCityAsync("London").GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
 
-            var data =
-                currentWeatherApiClient.GetByCityAsync("London").ConfigureAwait(false).GetAwaiter().GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(data, Formatting.Indented));
+                var cityAsHtml = client.GetByCityAsHtmlAsync("London").GetAwaiter().GetResult();
+                Console.WriteLine(cityAsHtml);
 
-            var cityAsHtml =
-                currentWeatherApiClient.GetByCityAsHtmlAsync("London")
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(cityAsHtml);
+                var cityCoordinates = client.GetByCityCoordinatesAsync(51.507351f, -0.127758f).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityCoordinates, Formatting.Indented));
 
-            var cityCoordinates =
-                currentWeatherApiClient.GetByCityCoordinatesAsync(51.507351f, -0.127758f)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityCoordinates, Formatting.Indented));
+                var cityCoordinatesAsHtml =
+                    client.GetByCityCoordinatesAsHtmlAsync(51.507351f, -0.127758f).GetAwaiter().GetResult();
+                Console.WriteLine(cityCoordinatesAsHtml);
 
-            var cityCoordinatesAsHtml =
-                currentWeatherApiClient.GetByCityCoordinatesAsHtmlAsync(51.507351f, -0.127758f)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(cityCoordinatesAsHtml);
+                var cityId = client.GetByCityIdAsync(2643743).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityId, Formatting.Indented));
 
-            var cityId =
-                currentWeatherApiClient.GetByCityIdAsync(2643743).ConfigureAwait(false).GetAwaiter().GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityId, Formatting.Indented));
+                var cityIdAsHtml = client.GetByCityIdAsHtmlAsync(2643743).GetAwaiter().GetResult();
+                Console.WriteLine(cityIdAsHtml);
 
-            var cityIdAsHtml =
-                currentWeatherApiClient.GetByCityIdAsHtmlAsync(2643743)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(cityIdAsHtml);
+                var cityZip = client.GetByZipCodeAsync(79066, "US").GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityZip, Formatting.Indented));
 
-            var cityZip =
-                currentWeatherApiClient.GetByZipCodeAsync(79066, "US")
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityZip, Formatting.Indented));
+                var cityZipAsHtml = client.GetByZipCodeAsHtmlAsync(79066, "US").GetAwaiter().GetResult();
+                Console.WriteLine(cityZipAsHtml);
 
-            var cityZipAsHtml =
-                currentWeatherApiClient.GetByZipCodeAsHtmlAsync(79066, "US")
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(cityZipAsHtml);
+                var cityByRectangle = client.GetByRectangleAsync(-179, -89, 179, 89, 10, true).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityByRectangle, Formatting.Indented));
 
-            var cityByRectangle =
-                currentWeatherApiClient.GetByRectangleAsync(-179, -89, 179, 89, 10, true)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityByRectangle, Formatting.Indented));
+                var cityByCircle = client.GetByCircleAsync(55.5f, 37.5f, true).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(cityByCircle, Formatting.Indented));
 
-            var cityByCircle =
-                currentWeatherApiClient.GetByCircleAsync(55.5f, 37.5f, true)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(cityByCircle, Formatting.Indented));
-
-            var citiesByIds =
-                currentWeatherApiClient.GetByCitiesIdsAsync(524901, 703448, 2643743)
-                    .ConfigureAwait(false)
-                    .GetAwaiter()
-                    .GetResult();
-            Console.WriteLine(JsonConvert.SerializeObject(citiesByIds, Formatting.Indented));
+                var citiesByIds = client.GetByCitiesIdsAsync(524901, 703448, 2643743).GetAwaiter().GetResult();
+                Console.WriteLine(JsonConvert.SerializeObject(citiesByIds, Formatting.Indented));
+            }
         }
     }
 }

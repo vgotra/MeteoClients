@@ -29,8 +29,10 @@ using Newtonsoft.Json;
 
 namespace MeteoClients.OpenWeatherMap
 {
-    public class OpenWeatherMapApiClientBase : IOpenWeatherMapApiClientBase
+    public class OpenWeatherMapApiClientBase : IOpenWeatherMapApiClientBase, IDisposable
     {
+        private readonly HttpClient _httpClient = new HttpClient();
+
         public OpenWeatherMapApiClientBase(string apiKey, string baseUrl = "http://api.openweathermap.org/data/2.5")
         {
             if (string.IsNullOrWhiteSpace(apiKey))
@@ -54,9 +56,9 @@ namespace MeteoClients.OpenWeatherMap
         public SupportedLanguage Language { get; set; } = SupportedLanguage.English;
         public int CountInResponse { get; set; } = 10;
 
-        protected static async Task<T> GetWeatherAsync<T>(string url, Encoding encoding = null) where T: class
+        protected async Task<T> GetWeatherAsync<T>(string url, Encoding encoding = null) where T: class
         {
-            var message = await new HttpClient().GetAsync(url).ConfigureAwait(false);
+            var message = await _httpClient.GetAsync(url).ConfigureAwait(false);
             message.EnsureSuccessStatusCode();
 
             string response = null;
@@ -72,9 +74,9 @@ namespace MeteoClients.OpenWeatherMap
             return JsonConvert.DeserializeObject<T>(response);
         }
 
-        protected static async Task<string> GetWeatherAsHtmlAsync(string url, Encoding encoding = null)
+        protected async Task<string> GetWeatherAsHtmlAsync(string url, Encoding encoding = null)
         {
-            var message = await new HttpClient().GetAsync($"{url}&mode=html").ConfigureAwait(false);
+            var message = await _httpClient.GetAsync($"{url}&mode=html").ConfigureAwait(false);
             message.EnsureSuccessStatusCode();
 
             if (encoding == null)
@@ -201,6 +203,11 @@ namespace MeteoClients.OpenWeatherMap
             temp = ApplyCountOfResultsOptions(temp);
 
             return temp;
+        }
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
         }
     }
 }
