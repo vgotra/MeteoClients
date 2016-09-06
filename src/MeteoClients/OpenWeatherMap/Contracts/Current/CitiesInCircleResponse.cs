@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 // 
 // Copyright (c) 2016 Volodymyr Gotra
 // 
@@ -22,12 +22,14 @@
 // 
 using System.Collections.Generic;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap.Contracts.Current
 {
-    public class Hourly
+    public class CitiesInCircleResponse
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        public int Cod { get; set; }
+        public float? CalcTime { get; set; }
+        public string Message { get; set; }
+        public int Count { get; set; }
+        public List<GenericResponse> @List { get; set; }
     }
 }

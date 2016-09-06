@@ -21,13 +21,22 @@
 // SOFTWARE.
 // 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap.Contracts.ShortTermForecast
 {
-    public class Hourly
+    public class ForecastItem
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        public long Dt { get; set; }
+
+        [JsonProperty(PropertyName = "dt_txt")]
+        public string DtTxt { get; set; }
+
+        public Main Main { get; set; }
+        public Cloud Clouds { get; set; }
+        public Wind Wind { get; set; }
+        public List<Weather> Weather { get; set; }
+        public Rain Rain { get; set; }
+        public AnotherSys Sys { get; set; }
     }
 }

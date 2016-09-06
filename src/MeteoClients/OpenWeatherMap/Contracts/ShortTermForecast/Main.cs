@@ -20,14 +20,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap.Contracts.ShortTermForecast
 {
-    public class Hourly
+    public class Main
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        public float Temp { get; set; }
+        public float Pressure { get; set; }
+        public int Humidity { get; set; }
+
+        [JsonProperty(PropertyName = "temp_min")]
+        public float TempMin { get; set; }
+
+        [JsonProperty(PropertyName = "temp_max")]
+        public float TempMax { get; set; }
+
+        [JsonProperty(PropertyName = "sea_level")]
+        public float SeaLevel { get; set; }
+
+        [JsonProperty(PropertyName = "grnd_level")]
+        public float GrndLevel { get; set; }
+
+        [JsonProperty(PropertyName = "temp_kf")]
+        public float TempKf { get; set; }
     }
 }

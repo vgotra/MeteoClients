@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 // 
 // Copyright (c) 2016 Volodymyr Gotra
 // 
@@ -20,14 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using MeteoClients.OpenWeatherMap.Contracts.ShortTermForecast;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap
 {
-    public class Hourly
+    public interface IShortTermForecastApiClient : IOpenWeatherMapApiClientBase
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        Task<GenericResponse> GetByCityAsync(string city, string countryCode = null);
+        Task<GenericResponse> GetByCityIdAsync(int cityId);
+        Task<GenericResponse> GetByCityCoordinatesAsync(float latitude, float longitude);
     }
 }

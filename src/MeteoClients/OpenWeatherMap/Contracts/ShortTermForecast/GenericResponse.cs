@@ -22,12 +22,14 @@
 // 
 using System.Collections.Generic;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap.Contracts.ShortTermForecast
 {
-    public class Hourly
+    public class GenericResponse
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        public int Cnt { get; set; }
+        public string Message { get; set; }
+        public string Cod { get; set; }
+        public City City { get; set; }
+        public List<ForecastItem> List { get; set; }
     }
 }

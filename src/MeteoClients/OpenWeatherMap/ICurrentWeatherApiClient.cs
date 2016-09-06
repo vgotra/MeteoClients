@@ -1,0 +1,45 @@
+﻿// The MIT License (MIT)
+// 
+// Copyright (c) 2016 Volodymyr Gotra
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// 
+using System.Threading.Tasks;
+using MeteoClients.OpenWeatherMap.Contracts.Current;
+
+namespace MeteoClients.OpenWeatherMap
+{
+    public interface ICurrentWeatherApiClient : IOpenWeatherMapApiClientBase
+    {
+        Task<GenericResponse> GetByCityAsync(string city, string countryCode = null);
+        Task<string> GetByCityAsHtmlAsync(string city, string countryCode = null);
+        Task<GenericResponse> GetByCityIdAsync(int cityId);
+        Task<MultipleCitiesResponse> GetByCitiesIdsAsync(params int[] cityIds);
+        Task<string> GetByCityIdAsHtmlAsync(int cityId);
+        Task<GenericResponse> GetByCityCoordinatesAsync(float latitude, float longitude);
+        Task<string> GetByCityCoordinatesAsHtmlAsync(float latitude, float longitude);
+        Task<GenericResponse> GetByZipCodeAsync(int zipCode, string countryCode);
+        Task<string> GetByZipCodeAsHtmlAsync(int zipCode, string countryCode);
+
+        Task<CitiesInRectangleResponse> GetByRectangleAsync(float longitudeTopLeft, float latitudeTopLeft, float longitudeBottomRight, float latitudeBottomRight, float zoom,
+            bool useServerClustering);
+
+        Task<CitiesInCircleResponse> GetByCircleAsync(float centerLongitude, float centerLatitude, bool useServerClustering);
+    }
+}

@@ -20,14 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-using System.Collections.Generic;
+using MeteoClients.OpenWeatherMap.Settings;
 
-namespace MeteoClients.ForecastIo.Contracts
+namespace MeteoClients.OpenWeatherMap
 {
-    public class Hourly
+    public interface IOpenWeatherMapApiClientBase
     {
-        public string Summary { get; set; }
-        public string Icon { get; set; }
-        public List<HourForecast> Data { get; set; }
+        string BaseUrl { get; }
+        string ApiKey { get; }
+        SearchAccuracy SearchAccuracy { get; set; }
+        UnitsFormat UnitsFormat { get; set; }
+        SupportedLanguage Language { get; set; }
+        int CountInResponse { get; set; }
     }
 }
