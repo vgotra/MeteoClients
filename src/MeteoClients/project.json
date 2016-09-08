@@ -1,4 +1,4 @@
-{
+﻿{
   "copyright": "Copyright (c) 2016 Volodymyr Gotra",
   "title": "MeteoClients",
   "description": ".NET Core implementation of REST clients for few weather services.",
@@ -8,28 +8,22 @@
     "Newtonsoft.Json": "9.0.1"
   },
 
-  //"runtimes": {
-  //  "win10-x64": {},
-  //  "osx.10.11-x64": {},
-  //  "ubuntu.16.04-x64": {}
-  //},
-
   "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50",
       "dependencies": {
         "NETStandard.Library": "1.6.0"
       }
+    },
+    "net452": {
+      "dependencies": {
+        "Microsoft.Net.Http": "2.2.29"
+      }
+    },
+    "net46": {
+      "dependencies": {
+        "Microsoft.Net.Http": "2.2.29"
+      }
     }
-    //"net452": {
-    //  "dependencies": {
-    //    "Microsoft.Net.Http": "2.2.29"
-    //  }
-    //},
-    //"net46": {
-    //  "dependencies": {
-    //    "Microsoft.Net.Http": "2.2.29"
-    //  }
-    //}
   }
 }
