@@ -1,8 +1,9 @@
 {
-  "copyright": "Copyright (c) 2016 Volodymyr Gotra",
-  "title": "MeteoClients",
-  "description": ".NET Core implementation of REST clients for few weather services.",
   "version": "1.0.0-*",
+  "buildOptions": {
+    "debugType": "portable",
+    "emitEntryPoint": true
+  },
 
   "dependencies": {
     "Newtonsoft.Json": "9.0.1"
@@ -15,20 +16,25 @@
   //},
 
   "frameworks": {
-    "netstandard1.6": {
+    "netcoreapp1.0": {
       "imports": "dnxcore50",
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "MeteoClients": "1.0.0-*",
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
       }
     }
+    //,
     //"net452": {
     //  "dependencies": {
-    //    "Microsoft.Net.Http": "2.2.29"
+    //    "MeteoClients": "1.0.0-*"
     //  }
     //},
     //"net46": {
     //  "dependencies": {
-    //    "Microsoft.Net.Http": "2.2.29"
+    //    "MeteoClients": "1.0.0-*"
     //  }
     //}
   }

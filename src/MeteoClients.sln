@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B2FDD934-443D-4E19-85F3-C9442E8B464F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ForecastIo", "Samples\ForecastIo\ForecastIo\ForecastIo.xproj", "{395C7EBC-5F03-4B98-8CAF-F01F17E48821}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ForecastIo", "Samples\ForecastIo\ForecastIo.xproj", "{395C7EBC-5F03-4B98-8CAF-F01F17E48821}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "OpenWeatherMap", "Samples\OpenWeatherMap\OpenWeatherMap.xproj", "{096275FF-4207-4B44-A2E3-08730268A949}"
 EndProject

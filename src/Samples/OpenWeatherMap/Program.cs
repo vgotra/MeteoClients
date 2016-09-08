@@ -34,7 +34,7 @@ namespace OpenWeatherMap
             // get your api key at https://home.openweathermap.org/api_keys page
             var apiKey = "881c6ac8ad540793a69ff2eb9bbb3119";
             CheckCurrentWeather(apiKey);
-            //CheckShortTermWeather(apiKey);
+            CheckShortTermWeather(apiKey);
         }
 
         private static void CheckShortTermWeather(string apiKey)
